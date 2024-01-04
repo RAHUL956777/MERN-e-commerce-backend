@@ -1,0 +1,25 @@
+# Node.js
+node_modules/
+
+# Environment-specific configuration
+.env
+
+# Logs
+*.log
+
+# Temporary files
+.tmp/
+
+# TypeScript
+*.js
+*.js.map
+*.d.ts
+
+# Visual Studio Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
