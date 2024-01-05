@@ -14,7 +14,6 @@ export const newUser = async (
       email,
       photo,
       gender,
-      role,
       _id,
       dob,
     });
@@ -23,5 +22,10 @@ export const newUser = async (
       success: true,
       message: `Welcome ${user.name}`,
     });
-  } catch {}
+  } catch {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
 };
