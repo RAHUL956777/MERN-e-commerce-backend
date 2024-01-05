@@ -15,7 +15,7 @@ app.get("/", (req, res) => {
   res.send("API working with /api/v1");
 });
 
-// ushing routes
+// ushing user routes routes
 app.use("/api/v1/user", userRoute);
 
 app.listen(PORT, () => {
