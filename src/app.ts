@@ -19,8 +19,7 @@ app.get("/", (req, res) => {
 // ushing user routes routes
 app.use("/api/v1/user", userRoute);
 
-
-app.use(errorMiddleWare)
+app.use(errorMiddleWare);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
