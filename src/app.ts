@@ -1,4 +1,4 @@
-import express from "express";
+import express, { urlencoded } from "express";
 import { connectDB } from "./utils/features";
 import { errorMiddleWare } from "./middlewares/error";
 
@@ -12,6 +12,7 @@ connectDB();
 const app = express();
 
 app.use(express.json());
+app.use(urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
   res.send("API working with /api/v1");
