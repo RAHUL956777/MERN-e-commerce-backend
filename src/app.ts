@@ -24,6 +24,7 @@ app.use("/api/v1/user", userRoute);
 // ushing product routes
 app.use("/api/v1/product", productRoute);
 
+app.use("/uploads", express.static("uploads"));
 app.use(errorMiddleWare);
 
 app.listen(PORT, () => {
