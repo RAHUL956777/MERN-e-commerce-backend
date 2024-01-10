@@ -1,6 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { TryCatch } from "../middlewares/error";
-import { NewProductRequestBody } from "../types/types";
+import {
+  BaseQuery,
+  NewProductRequestBody,
+  SearchRequestQuery,
+} from "../types/types";
 import { Product } from "../models/product.model";
 import ErrorHandler from "../utils/utilityClass";
 import { rm } from "fs";
@@ -126,3 +130,36 @@ export const deleteProduct = TryCatch(async (req, res, next) => {
     message: "Product Deleted successfully",
   });
 });
+
+export const getAllProducts = TryCatch(
+  async (req: Request<{}, {}, {}, SearchRequestQuery>, res, next) => {
+    const { search, sort, category, price } = req.query;
+
+    const page = Number(req.query.page) || 1;
+
+    const limit = Number(process.env.PRODUCT_PER_PAGE) || 8;
+    const skip = limit * (page - 1);
+
+    // price: ,
+    // category,
+    const baseQuery: BaseQuery = {};
+
+    if (search)
+      baseQuery.name = {
+        $regex: search,
+        $options: "i",
+      };
+
+    if (price)
+      baseQuery.price = {
+        $lte: Number(price),
+      };
+
+    const products = await Product.find(baseQuery);
+
+    return res.status(200).json({
+      success: true,
+      message: "latest product get successfully",
+    });
+  }
+);
