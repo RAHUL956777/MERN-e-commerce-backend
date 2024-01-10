@@ -2,11 +2,13 @@ import express from "express";
 
 import { adminOnly } from "../middlewares/auth";
 import {
+  deleteProduct,
   getAdminProducts,
   getAllCategories,
   getLatestProducts,
   getSingleProduct,
   newProduct,
+  updateProduct,
 } from "../controllers/product.controller";
 import { singleUpload } from "../middlewares/multer";
 
@@ -24,6 +26,10 @@ app.get("/categories", getAllCategories);
 //To get all products - /api/v1/product/admin-products
 app.get("/admin-products", getAdminProducts);
 
-app.route("/:id").get(getSingleProduct).put()
+app
+  .route("/:id")
+  .get(getSingleProduct)
+  .put(singleUpload, updateProduct)
+  .delete(deleteProduct);
 
 export default app;
