@@ -9,6 +9,8 @@ import { Product } from "../models/product.model";
 import ErrorHandler from "../utils/utilityClass";
 import { rm } from "fs";
 
+import { faker } from "@faker-js/faker";
+
 export const newProduct = TryCatch(
   async (
     req: Request<{}, {}, NewProductRequestBody>,
@@ -140,8 +142,6 @@ export const getAllProducts = TryCatch(
     const limit = Number(process.env.PRODUCT_PER_PAGE) || 8;
     const skip = limit * (page - 1);
 
-    // price: ,
-    // category,
     const baseQuery: BaseQuery = {};
 
     if (search)
@@ -155,11 +155,63 @@ export const getAllProducts = TryCatch(
         $lte: Number(price),
       };
 
-    const products = await Product.find(baseQuery);
+    if (category) baseQuery.category = category;
+
+    const productPromise = Product.find(baseQuery)
+      .sort(sort ? { price: sort === "asc" ? 1 : -1 } : undefined)
+      .limit(limit)
+      .skip(skip);
+
+    const [products, filteredOnlyProduct] = await Promise.all([
+      productPromise,
+      Product.find(baseQuery),
+    ]);
+
+    const totalPage = Math.ceil(filteredOnlyProduct.length / limit);
 
     return res.status(200).json({
       success: true,
       message: "latest product get successfully",
+      products,
+      totalPage,
     });
   }
 );
+
+//generate dumym product for testing
+// const generateRandomProducts = async (count: number = 10) => {
+//   const products = [];
+
+//   for (let i = 0; i < count; i++) {
+//     const product = {
+//       name: faker.commerce.productName(),
+//       photo: "uploads\\99b9e1ad-111c-472d-8b47-df51fbcc80bb.jpg",
+//       price: faker.commerce.price({ min: 1500, max: 80000, dec: 0 }),
+//       stock: faker.commerce.price({ min: 0, max: 100, dec: 0 }),
+//       category: faker.commerce.department(),
+//       createdAt: new Date(faker.date.past()),
+//       updatedAt: new Date(faker.date.recent()),
+//       __v: 0,
+//     };
+
+//     products.push(product);
+//   }
+//   await Product.create(products);
+//   console.log({ success: true });
+// };
+
+// generateRandomProducts(40);
+
+
+//delete dummy products
+// const deleteRnadomProducts = async (count: number = 10) => {
+//   const products = await Product.find({}).skip(2);
+
+//   for (let i = 0; i < products.length; i++) {
+//     const product = products[i];
+//     await product.deleteOne();
+//   }
+//   console.log({ success: true });
+// };
+
+// deleteRnadomProducts();
