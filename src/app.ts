@@ -1,6 +1,7 @@
 import express, { urlencoded } from "express";
 import { connectDB } from "./utils/features";
 import { errorMiddleWare } from "./middlewares/error";
+import NodeCache from "node-cache";
 
 // importing routes
 import userRoute from "./routes/user.routes";
@@ -10,6 +11,7 @@ const PORT = 8000;
 connectDB();
 
 const app = express();
+export const myCache = new NodeCache();
 
 app.use(express.json());
 app.use(urlencoded({ extended: true }));
