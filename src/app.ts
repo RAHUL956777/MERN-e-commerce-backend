@@ -2,29 +2,43 @@ import express, { urlencoded } from "express";
 import { connectDB } from "./utils/features";
 import { errorMiddleWare } from "./middlewares/error";
 import NodeCache from "node-cache";
+import { config } from "dotenv";
+import morgan from "morgan";
 
 // importing routes
 import userRoute from "./routes/user.routes";
 import productRoute from "./routes/product.routes";
+import orderRoute from "./routes/order.routes";
 
-const PORT = 8000;
-connectDB();
+config({
+  path: "./.env",
+});
+
+const PORT = process.env.PORT || 4000;
+
+const mongoURI = process.env.MONGO_URI || "";
+
+connectDB(mongoURI);
 
 const app = express();
 export const myCache = new NodeCache();
 
 app.use(express.json());
 app.use(urlencoded({ extended: true }));
+app.use(morgan("dev"));
 
 app.get("/", (req, res) => {
   res.send("API working with /api/v1");
 });
 
-// ushing user routes routes
+// using user routes routes
 app.use("/api/v1/user", userRoute);
 
-// ushing product routes
+// using product routes
 app.use("/api/v1/product", productRoute);
+
+// using order routes
+app.use("/api/v1/order", orderRoute);
 
 app.use("/uploads", express.static("uploads"));
 app.use(errorMiddleWare);

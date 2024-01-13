@@ -3,9 +3,11 @@ import { InvalidateCacheProps } from "../types/types";
 import { Product } from "../models/product.model";
 import { myCache } from "../app";
 
-export const connectDB = async () => {
+export const connectDB = async (uri:string) => {
   try {
-    await mongoose.connect("mongodb://127.0.0.1:27017/ecommerce_2024", {});
+    await mongoose.connect(uri, {
+      dbName:"ecommerce_2024"
+    });
     console.log("Connected to MongoDB");
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
