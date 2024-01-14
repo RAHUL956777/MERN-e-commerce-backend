@@ -53,7 +53,20 @@ const schema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["Processing", "Shipping", "Delivered"],
+      default: "Processing",
     },
+    orderItems: [
+      {
+        name: String,
+        photo: String,
+        price: Number,
+        quantity: Number,
+        productId: {
+          type: mongoose.Types.ObjectId,
+          ref: "Product",
+        },
+      },
+    ],
   },
   {
     timestamps: true,
