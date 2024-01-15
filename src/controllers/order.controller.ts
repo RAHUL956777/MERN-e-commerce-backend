@@ -58,7 +58,22 @@ export const myOrders = TryCatch(async (req, res, next) => {
     myCache.set(key, JSON.stringify(orders));
   }
 
-  return res.status(201).json({
+  return res.status(200).json({
+    success: true,
+    orders,
+  });
+});
+
+export const allOrders = TryCatch(async (req, res, next) => {
+  const key = `all-orders`;
+  let orders = [];
+
+  if (myCache.has(key)) orders = JSON.parse(myCache.get(key) as string);
+  else {
+    orders = await Order.find().populate("");
+    myCache.set(key, JSON.stringify(orders));
+  }
+  return res.status(200).json({
     success: true,
     orders,
   });
