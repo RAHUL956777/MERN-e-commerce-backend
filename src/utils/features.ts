@@ -18,6 +18,7 @@ export const invalidateCache = async ({
   product,
   order,
   admin,
+  userId,
 }: InvalidateCacheProps) => {
   if (product) {
     const productKeys: string[] = [
