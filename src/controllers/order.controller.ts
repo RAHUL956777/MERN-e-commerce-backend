@@ -39,7 +39,12 @@ export const newOrder = TryCatch(
 
     await reduceStock(orderItems);
 
-    await invalidateCache({ product: true, order: true, admin: true });
+    await invalidateCache({
+      product: true,
+      order: true,
+      admin: true,
+      userId: user,
+    });
 
     return res.status(201).json({
       success: true,
@@ -49,9 +54,12 @@ export const newOrder = TryCatch(
 );
 
 export const myOrders = TryCatch(async (req, res, next) => {
+
   const { id: user } = req.query;
+
   const key = `my-orders${user}`;
   let orders = [];
+  
   if (myCache.has(key)) orders = JSON.parse(myCache.get(key) as string);
   else {
     orders = await Order.find({ user });
@@ -80,6 +88,7 @@ export const allOrders = TryCatch(async (req, res, next) => {
 });
 
 export const getSingleOrder = TryCatch(async (req, res, next) => {
+  
   const { id } = req.params;
   const key = `order-${id}`;
 
@@ -118,11 +127,13 @@ export const processOrder = TryCatch(async (req, res, next) => {
   }
 
   await order.save();
+
   await invalidateCache({
     product: false,
     order: true,
     admin: true,
     userId: order.user,
+    orderId: String(order._id),
   });
 
   return res.status(200).json({
@@ -138,11 +149,13 @@ export const deleteOrder = TryCatch(async (req, res, next) => {
   if (!order) return next(new ErrorHandler("Order Not Found", 404));
 
   await order.deleteOne();
+
   await invalidateCache({
     product: false,
     order: true,
     admin: true,
     userId: order.user,
+    orderId: String(order._id),
   });
 
   return res.status(200).json({
