@@ -26,7 +26,7 @@ export const newOrder = TryCatch(
     if (!shippingInfo || !orderItems || !user || !subtotal || !tax || !total)
       return next(new ErrorHandler("Please Enter All Fields", 400));
 
-    await Order.create({
+    const order = await Order.create({
       shippingInfo,
       orderItems,
       user,
@@ -44,6 +44,7 @@ export const newOrder = TryCatch(
       order: true,
       admin: true,
       userId: user,
+      productId:order.orderItems.map(item=>String(item.productId)),
     });
 
     return res.status(201).json({
