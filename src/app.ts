@@ -9,6 +9,7 @@ import morgan from "morgan";
 import userRoute from "./routes/user.routes";
 import productRoute from "./routes/product.routes";
 import orderRoute from "./routes/order.routes";
+import paymentRoute from "./routes/payment.routes";
 
 config({
   path: "./.env",
@@ -41,6 +42,9 @@ app.use("/api/v1/product", productRoute);
 app.use("/api/v1/order", orderRoute);
 
 app.use("/uploads", express.static("uploads"));
+
+app.use("/api/v1/payment", paymentRoute);
+
 app.use(errorMiddleWare);
 
 app.listen(PORT, () => {
