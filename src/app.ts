@@ -10,6 +10,7 @@ import userRoute from "./routes/user.routes";
 import productRoute from "./routes/product.routes";
 import orderRoute from "./routes/order.routes";
 import paymentRoute from "./routes/payment.routes";
+import dashboardRoute from "./routes/stats.routes";
 
 config({
   path: "./.env",
@@ -43,7 +44,11 @@ app.use("/api/v1/order", orderRoute);
 
 app.use("/uploads", express.static("uploads"));
 
+//using payment routes
 app.use("/api/v1/payment", paymentRoute);
+
+//using dashboard routes
+app.use("/api/v1/dashboard", dashboardRoute);
 
 app.use(errorMiddleWare);
 
