@@ -61,3 +61,5 @@ export const reduceStock = async (orderItems: OrderItemType[]) => {
     await product.save();
   }
 };
+
+export const calculatePercentage = ()=>{}

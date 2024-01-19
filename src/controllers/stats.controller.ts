@@ -1,5 +1,8 @@
 import { myCache } from "../app";
 import { TryCatch } from "../middlewares/error";
+import { Order } from "../models/order.model";
+import { Product } from "../models/product.model";
+import { User } from "../models/user.model";
 
 export const getDashboardStats = TryCatch(async (req, res, next) => {
   let stats;
@@ -9,13 +12,60 @@ export const getDashboardStats = TryCatch(async (req, res, next) => {
   else {
     const today = new Date();
 
-    const startOfThisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const startOfLastMonth = new Date(
-      today.getFullYear(),
-      today.getMonth() - 1
-    );
+    const thisMonth = {
+      start: new Date(today.getFullYear(), today.getMonth(), 1),
+      end: today,
+    };
+
+    const lastMonth = {
+      start: new Date(today.getFullYear(), today.getMonth() - 1, 1),
+      end: new Date(today.getFullYear(), today.getMonth(), 0),
+    };
+
+    const thisMonthProductsPromise = Product.find({
+      createdAt: { $gte: thisMonth.start, $lte: thisMonth.end },
+    });
+
+    const lastMonthUsersPromise = await Product.find({
+      createdAt: { $gte: lastMonth.start, $lte: lastMonth.end },
+    });
+
+    const thisMonthUsersPromise = User.find({
+      createdAt: { $gte: thisMonth.start, $lte: thisMonth.end },
+    });
+
+    const lastMonthProductsPromise = User.find({
+      createdAt: { $gte: lastMonth.start, $lte: lastMonth.end },
+    });
+
+    const thisMonthOrdersPromise = Order.find({
+      createdAt: { $gte: thisMonth.start, $lte: thisMonth.end },
+    });
+
+    const lastMonthOrdersPromise = Order.find({
+      createdAt: { $gte: lastMonth.start, $lte: lastMonth.end },
+    });
+
+    const [
+      thisMonthProducts,
+      thisMonthUsers,
+      thisMonthOrders,
+      lastMonthProducts,
+      lastMonthUsers,
+      lastMonthOrders,
+    ] = await Promise.all([
+      thisMonthProductsPromise,
+      thisMonthUsersPromise,
+      thisMonthOrdersPromise,
+      lastMonthProductsPromise,
+      lastMonthUsersPromise,
+      lastMonthOrdersPromise,
+    ]);
+
 
     
+
+
   }
 
   return res.status(200).json({
