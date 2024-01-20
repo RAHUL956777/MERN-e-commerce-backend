@@ -61,6 +61,10 @@ export const getDashboardStats = TryCatch(async (req, res, next) => {
       createdAt: { $gte: sixMonthAgo, $lte: today },
     });
 
+    const latestTransactionPromise = Order.find({})
+      .select(["orderItems", "discount", "total", "status"])
+      .limit(4);
+
     const [
       thisMonthProducts,
       thisMonthUsers,
@@ -73,6 +77,8 @@ export const getDashboardStats = TryCatch(async (req, res, next) => {
       allOrders,
       lastSixMonthOrders,
       categories,
+      femaleUsersCount,
+      latestTransaction,
     ] = await Promise.all([
       thisMonthProductsPromise,
       thisMonthUsersPromise,
@@ -85,6 +91,8 @@ export const getDashboardStats = TryCatch(async (req, res, next) => {
       Order.find({}).select("total"),
       lastSixMonthOrdersPromise,
       Product.distinct("category"),
+      User.countDocuments({ gender: "female" }),
+      latestTransactionPromise,
     ]);
 
     const thisMonthRevenue = thisMonthOrders.reduce(
@@ -141,22 +149,41 @@ export const getDashboardStats = TryCatch(async (req, res, next) => {
 
     const categoriesCount = await Promise.all(categoriesCountPromise);
 
-    const categoryCount = [];
+    const categoryCount: Record<string, number>[] = [];
+
     categories.forEach((category, index) => {
       categoryCount.push({
-        car: categoriesCount[index],
+        [category]: Math.round((categoriesCount[index] / productsCount) * 100),
       });
     });
 
+    const userRatio = {
+      male: usersCount - femaleUsersCount,
+      frmale: femaleUsersCount,
+    };
+
+    const modifiedLatestTransaction = latestTransaction.map((order) => ({
+      _id: order._id,
+      discount: order.discount,
+      amount: order.total,
+      quantity: order.orderItems.length,
+      status: order.status,
+    }));
+
     stats = {
-      categoriesCount,
+      categoryCount,
       changePercent,
       count,
       chart: {
         order: orderMonthCounts,
         revenue: orderMonthlyRevenew,
       },
+      userRatio,
+      latestTransaction: modifiedLatestTransaction,
     };
+
+    myCache.set("admin-stats", JSON.stringify(stats));
+
   }
 
   return res.status(200).json({
