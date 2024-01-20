@@ -52,7 +52,7 @@ const schema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Processing", "Shipping", "Delivered"],
+      enum: ["Processing", "Shipped", "Delivered"],
       default: "Processing",
     },
     orderItems: [

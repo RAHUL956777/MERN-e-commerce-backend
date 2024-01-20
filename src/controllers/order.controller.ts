@@ -44,7 +44,7 @@ export const newOrder = TryCatch(
       order: true,
       admin: true,
       userId: user,
-      productId:order.orderItems.map(item=>String(item.productId)),
+      productId: order.orderItems.map((item) => String(item.productId)),
     });
 
     return res.status(201).json({
@@ -55,12 +55,11 @@ export const newOrder = TryCatch(
 );
 
 export const myOrders = TryCatch(async (req, res, next) => {
-
   const { id: user } = req.query;
 
   const key = `my-orders${user}`;
   let orders = [];
-  
+
   if (myCache.has(key)) orders = JSON.parse(myCache.get(key) as string);
   else {
     orders = await Order.find({ user });
@@ -89,7 +88,6 @@ export const allOrders = TryCatch(async (req, res, next) => {
 });
 
 export const getSingleOrder = TryCatch(async (req, res, next) => {
-  
   const { id } = req.params;
   const key = `order-${id}`;
 
@@ -117,9 +115,9 @@ export const processOrder = TryCatch(async (req, res, next) => {
 
   switch (order.status) {
     case "Processing":
-      order.status = "Shipping";
+      order.status = "Shipped";
       break;
-    case "Shipping":
+    case "Shipped":
       order.status = "Delivered";
       break;
     default:
