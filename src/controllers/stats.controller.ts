@@ -187,18 +187,30 @@ export const getPieCharts = TryCatch(async (req, res, next) => {
   if (myCache.has("admin-pie-charts"))
     charts = JSON.parse(myCache.get("admin-pie-charts") as string);
   else {
+    const allOrderPromise = Order.find({}).select([
+      "total",
+      "discount",
+      "subtotal",
+      "tax",
+      "shippingCharges",
+    ]);
+
     const [
       processingOrder,
       shippedOrder,
       deliveredOrder,
       categories,
       productsCount,
+      OutOfStock,
+      allOrders,
     ] = await Promise.all([
       Order.countDocuments({ status: "Processing" }),
       Order.countDocuments({ status: "Shipped" }),
       Order.countDocuments({ status: "Delivered" }),
       Product.distinct("category"),
       Product.countDocuments(),
+      Product.countDocuments({ stock: 0 }),
+      allOrderPromise,
     ]);
 
     const orderFullfillment = {
@@ -212,9 +224,46 @@ export const getPieCharts = TryCatch(async (req, res, next) => {
       productsCount,
     });
 
+    const stockAvailablity = {
+      inStock: productsCount - OutOfStock,
+      outOfStock: OutOfStock,
+    };
+
+    const GrossIncome = allOrders.reduce(
+      (prev, order) => prev + (order.total || 0),
+      0
+    );
+
+    const discount = allOrders.reduce(
+      (prev, order) => prev + (order.discount || 0),
+      0
+    );
+    //production cost dependts on the business to business
+    const productionCost = allOrders.reduce(
+      (prev, order) => prev + (order.shippingCharges || 0),
+      0
+    );
+
+    const burn = allOrders.reduce((prev, order) => prev + (order.tax || 0), 0);
+
+    const marketingCost = Math.round(GrossIncome - 30 / 100);
+
+    const netMargin =
+      GrossIncome - discount - productionCost - burn - marketingCost;
+
+    const revenueDistributation = {
+      netMargin,
+      discount,
+      productionCost,
+      burn,
+      marketingCost,
+    };
+
     charts = {
       orderFullfillment,
       productCategories,
+      stockAvailablity,
+      revenueDistributation,
     };
 
     myCache.set("admin-pie-charts", JSON.stringify(charts));
