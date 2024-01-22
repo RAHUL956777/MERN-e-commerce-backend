@@ -3,12 +3,16 @@ import mongoose from "mongoose";
 import {
   allCoupons,
   applyDiscount,
+  createPaymentIntent,
   deleteCoupons,
   newCoupon,
 } from "../controllers/payment.controller";
 import { adminOnly } from "../middlewares/auth";
 
 const app = express.Router();
+
+//@route POST /api/v1/payment/create
+app.post("/create", createPaymentIntent);
 
 //@route POST /api/v1/payment/discount
 app.post("/discount", applyDiscount);
