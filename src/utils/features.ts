@@ -14,7 +14,7 @@ export const connectDB = async (uri: string) => {
   }
 };
 
-export const invalidateCache = async ({
+export const invalidateCache = ({
   product,
   order,
   admin,
@@ -47,6 +47,12 @@ export const invalidateCache = async ({
     myCache.del(ordersKeys);
   }
   if (admin) {
+    myCache.del([
+      "admin-stats",
+      "admin-pie-charts",
+      "admin-bar-charts",
+      "admin-line-charts",
+    ]);
   }
 };
 
@@ -118,10 +124,9 @@ export const getChartData = ({
     const monthDiff = (today.getMonth() - creationDate.getMonth() + 12) % 12;
 
     if (monthDiff < length) {
-      if(property){
-        data[length - monthDiff - 1] +=  i[property]! ;
-      }
-      else{
+      if (property) {
+        data[length - monthDiff - 1] += i[property]!;
+      } else {
         data[length - monthDiff - 1] += 1;
       }
     }
