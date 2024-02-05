@@ -15,7 +15,7 @@ const app = express.Router();
 app.post("/create", createPaymentIntent);
 
 //@route POST /api/v1/payment/discount
-app.post("/discount", applyDiscount);
+app.get("/discount", applyDiscount);
 
 // admin only routes
 
